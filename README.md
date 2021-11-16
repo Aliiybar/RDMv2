@@ -7,7 +7,8 @@ This command creates a migration in DB project
 
 # Related Videos about this Project
 https://youtu.be/jTBkdfQnKfI
-
+https://youtu.be/QTVTQdQKjrA
+https://youtu.be/xY1iKdMIYJs
 # Related Sites
 MediatR : https://www.programmingwithwolfgang.com/mediator-pattern-in-asp-net-core-3-1/
 
