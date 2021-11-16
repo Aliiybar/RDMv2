@@ -1,0 +1,38 @@
+version: '3.4'
+
+services:
+  envoygateway:
+    build:
+      context: .
+      dockerfile: Envoy/Dockerfile    
+
+  healthcheck:
+    image: ${DOCKER_REGISTRY-}healthcheck
+    build:
+      context: .
+      dockerfile: HealthCheck/Dockerfile
+
+  rabbitmq:
+    image: rabbitmq:3-management
+
+  redis_server:
+    image: "redis"
+
+  sign.api:
+    image: ${DOCKER_REGISTRY-}signapi
+    build:
+      context: .
+      dockerfile: Sign/Sign.Api/Dockerfile
+
+  site.api:
+    image: ${DOCKER_REGISTRY-}siteapi
+    build:
+      context: .
+      dockerfile: Site/Site.Api/Dockerfile
+
+  sign.data:
+    image: "mcr.microsoft.com/mssql/server"
+
+  site.data:
+    image: "mcr.microsoft.com/mssql/server"
+

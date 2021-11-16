@@ -1,0 +1,82 @@
+version: '3.4'
+
+services:
+  envoygateway:
+    ports:
+      - "9901:9901"
+      - "10000:10000"
+      - "10001:10001"
+    volumes:
+      - ./Envoy/envoy.yaml:/etc/envoy/envoy.yaml
+      - ./Envoy/https.crt:/etc/ssl/certs/https.crt
+      - ./Envoy/key.pem:/etc/ssl/certs/key.pem
+
+  rabbitmq:
+    container_name: rabbitmq
+    ports:
+      - 5672:5672
+      - 15672:15672
+    environment:
+      - RABBITMQ_DEFAULT_USER=user
+      - RABBITMQ_DEFAULT_PASS=password        
+
+  sign.api:
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=https://+:6001;http://+:6000
+    ports:
+      - "6000:6000"
+      - "6001:6001"
+    volumes:
+      - ${APPDATA}/Microsoft/UserSecrets:/root/.microsoft/usersecrets:ro
+      - ${APPDATA}/ASP.NET/Https:/root/.aspnet/https:ro
+    links:
+      - "sign.data"
+    depends_on:
+      - "sign.data"
+      - "rabbitmq"
+      - "redis_server"
+
+  site.api:
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=https://+:6101;http://+:6100
+    ports:
+      - "6100:6100"
+      - "6101:6101"
+    volumes:
+      - ${APPDATA}/Microsoft/UserSecrets:/root/.microsoft/usersecrets:ro
+      - ${APPDATA}/ASP.NET/Https:/root/.aspnet/https:ro
+    depends_on:
+      - "site.data"
+      - "rabbitmq"
+      - "redis_server"
+
+  healthcheck:
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=https://+:5001;http://+:5000
+    ports:
+      - "5000:5000"
+      - "5001:5001"
+    volumes:
+      - ${APPDATA}/Microsoft/UserSecrets:/root/.microsoft/usersecrets:ro
+      - ${APPDATA}/ASP.NET/Https:/root/.aspnet/https:ro
+
+  sign.data:
+    environment:
+      - SA_PASSWORD=P@ssword56
+      - ACCEPT_EULA=Y
+    ports:
+      - "6010:1433"   
+
+  site.data:
+    environment:
+      - SA_PASSWORD=P@ssword56
+      - ACCEPT_EULA=Y
+    ports:
+      - "6110:1433"   
+
+  redis_server:
+    ports:
+    - "6379:6379"
